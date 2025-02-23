@@ -19,7 +19,7 @@ app.use("/api/v1/users", (req, res) => {
   res.json({ message: "API for user management" });
 });
 
-app.all("*", () => {
+app.all("*", (req , res) => {
   res.status(201).json({ message: "deployed" });
 });
 app.listen(PORT, async () => {
