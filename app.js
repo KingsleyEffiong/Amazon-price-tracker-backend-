@@ -22,6 +22,8 @@ app.use("/api/v1/users", (req, res) => {
 app.all("*", (req , res) => {
   res.status(201).json({ message: "deployed" });
 });
+
+
 app.listen(PORT, async () => {
   console.log(
     `Server is running on port http//localhost:${PORT} in ${NODE_ENV}`
