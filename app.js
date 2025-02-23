@@ -18,10 +18,9 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/users", (req, res) => {
   res.json({ message: "API for user management" });
 });
-
-app.all("*", (req , res) => {
-  res.status(201).json({ message: "deployed" });
-});
+app.all("*" , (req , res)=>{
+  res.status(404).json({ message: "Page not found" });
+})
 
 
 app.listen(PORT, async () => {
