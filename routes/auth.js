@@ -7,6 +7,6 @@ authRouter.post("/sign-up", signup);
 authRouter.post("/sign-in", signin);
 
 authRouter.post("/sign-out", (req, res) =>
-  res.send({ message: "The sign out route" })
+  res.status(200).json({ message: "The sign out route" })
 );
 export default authRouter;
