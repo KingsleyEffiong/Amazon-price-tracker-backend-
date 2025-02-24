@@ -12,9 +12,9 @@ export const signup = async (req, res, next) => {
     const { username, email, password } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      const error = new Error("Email already exists");
-      error.statusCode = 409;
-      throw error;
+      return res
+        .status(409)
+        .json({ success: false, error: "Email already exists" });
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -43,6 +43,14 @@ export const signup = async (req, res, next) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        error: Object.values(error.errors)
+          .map((err) => err.message)
+          .join(", "),
+      });
+    }
     next(error);
   }
 };
