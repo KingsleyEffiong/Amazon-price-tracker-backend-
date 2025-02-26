@@ -58,20 +58,18 @@ export const signin = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
-    console.log(user);
+
     if (!user) {
-      const error = new Error("User not found");
-      error.statusCode = 404;
-      throw error;
+      return res.status(404).json({ success: false, error: "User not found" });
     }
 
     const isPassword = await bcrypt.compare(password, user.password);
-
     if (!isPassword) {
-      const error = new Error("Invalid password");
-      error.statusCode = 401;
-      throw error;
+      return res
+        .status(401)
+        .json({ success: false, error: "Invalid password" });
     }
+
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
@@ -79,21 +77,17 @@ export const signin = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "User signed in successfully",
-      data: {
-        token,
-        user,
-      },
+      data: { token, user },
     });
   } catch (error) {
-    if (error.name === "ValidationError") {
-      return res.status(400).json({
-        success: false,
-        error: Object.values(error.errors)
-          .map((err) => err.message)
-          .join(", "),
-      });
-    }
-    next(error);
+    console.error("Signin Error:", error);
+
+    // Ensure the error response is always in JSON format
+    res.status(error.statusCode || 500).json({
+      success: false,
+      error: error.message || "Internal Server Error",
+    });
   }
 };
+
 export const sigout = async (req, res, next) => {};
