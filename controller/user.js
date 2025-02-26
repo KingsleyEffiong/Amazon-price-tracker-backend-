@@ -85,6 +85,14 @@ export const signin = async (req, res, next) => {
       },
     });
   } catch (error) {
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        error: Object.values(error.errors)
+          .map((err) => err.message)
+          .join(", "),
+      });
+    }
     next(error);
   }
 };
