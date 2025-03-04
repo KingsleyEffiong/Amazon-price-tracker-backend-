@@ -78,7 +78,7 @@ export const signin = async (req, res, next) => {
     res.cookie("token", token, {
       httpOnly: true,
       secure: false, // 🔥 Change to `true` only in production (HTTPS)
-      sameSite: "Lax", // ✅ `None` is required only for cross-site
+      sameSite: "None", // ✅ `None` is required only for cross-site
     });
 
     res.status(200).json({
