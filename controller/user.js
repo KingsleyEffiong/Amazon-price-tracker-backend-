@@ -73,14 +73,13 @@ export const signin = async (req, res, next) => {
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
-    
 
-    res.cookie("token", token,{
-      httpOnly:true,
-      secure:true,
-      sameSite:'Strict',
-      maxAge:3600000
-    })
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // Only secure in production
+      sameSite: "Lax", // Use "Lax" instead of "Strict" for better compatibility
+      maxAge: 3600000, // 1 hour
+    });
 
     res.status(200).json({
       success: true,
