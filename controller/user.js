@@ -71,13 +71,14 @@ export const signin = async (req, res, next) => {
     }
 
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
-      expiresIn: JWT_EXPIRES_IN,
+      expiresIn: "1d",
     });
 
+    // ✅ Fix: Properly set the cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true, // ✅ Set true if using HTTPS
-      sameSite: "None", // ✅ Required for cross-origin cookies
+      secure: false, // 🔥 Change to `true` only in production (HTTPS)
+      sameSite: "Lax", // ✅ `None` is required only for cross-site
     });
 
     res.status(200).json({
@@ -87,12 +88,7 @@ export const signin = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Signin Error:", error);
-
-    // Ensure the error response is always in JSON format
-    res.status(error.statusCode || 500).json({
-      success: false,
-      error: error.message || "Internal Server Error",
-    });
+    res.status(500).json({ success: false, error: "Internal Server Error" });
   }
 };
 
