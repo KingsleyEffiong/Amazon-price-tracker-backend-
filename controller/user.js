@@ -71,14 +71,14 @@ export const signin = async (req, res, next) => {
     }
 
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
-      expiresIn: "1d",
+      expiresIn: JWT_EXPIRES_IN,
     });
 
-    // ✅ Fix: Properly set the cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: false, // 🔥 Change to `true` only in production (HTTPS)
-      sameSite: "None", // ✅ `None` is required only for cross-site
+      secure: process.env.NODE_ENV === "production", // Only secure in production
+      sameSite: "Lax", // Use "Lax" instead of "Strict" for better compatibility
+      maxAge: 3600000, // 1 hour
     });
 
     res.status(200).json({
@@ -88,29 +88,36 @@ export const signin = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Signin Error:", error);
-    res.status(500).json({ success: false, error: "Internal Server Error" });
+
+    // Ensure the error response is always in JSON format
+    res.status(error.statusCode || 500).json({
+      success: false,
+      error: error.message || "Internal Server Error",
+    });
   }
 };
 
 export const sigout = async (req, res, next) => {};
 
-export const getUser = async (req, res) => {
+export const getUser = async (req, res, next) => {
   try {
-    const token = req.cookies.token; // Get token from cookies
-    if (!token) {
-      return res.status(401).json({ success: false, error: "Unauthorized" });
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid user ID" });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET); // Decode token
-    const user = await User.findById(decoded.userId).select("-password"); // Exclude password
+    const user = await User.findById(req.params.id).select("-password");
 
     if (!user) {
-      return res.status(404).json({ success: false, error: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
-    res.status(200).json({ success: true, user }); // Return user details
+    res.status(200).json({ success: true, data: user });
   } catch (error) {
-    console.error("GetUser Error:", error);
-    res.status(500).json({ success: false, error: "Server Error" });
+    console.error("Get User Error:", error);
+    next(error);
   }
 };
