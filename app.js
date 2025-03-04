@@ -5,6 +5,7 @@ import authRouter from "./routes/auth.js";
 import connectToDB from "./database/mongodb.js";
 import errorMiddleware from "./middleware/errorMiddleware.js";
 import cors from "cors";
+import { userRouter } from "./routes/user.js";
 
 const app = express();
 
@@ -15,9 +16,8 @@ app.use(cookieParser());
 app.use(errorMiddleware);
 
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/users", (req, res) => {
-  res.json({ message: "API for user management" });
-});
+app.use("/api/v1/users", userRouter);
+
 app.all("*", (req, res) => {
   res.status(200).json({ message: "API SUCCESSFUL" });
 });

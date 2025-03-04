@@ -73,6 +73,14 @@ export const signin = async (req, res, next) => {
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
       expiresIn: JWT_EXPIRES_IN,
     });
+    
+
+    res.cookie("token", token,{
+      httpOnly:true,
+      secure:true,
+      sameSite:'Strict',
+      maxAge:3600000
+    })
 
     res.status(200).json({
       success: true,
@@ -91,3 +99,26 @@ export const signin = async (req, res, next) => {
 };
 
 export const sigout = async (req, res, next) => {};
+
+export const getUser = async (req, res, next) => {
+  try {
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid user ID" });
+    }
+
+    const user = await User.findById(req.params.id).select("-password");
+
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res.status(200).json({ success: true, data: user });
+  } catch (error) {
+    console.error("Get User Error:", error);
+    next(error);
+  }
+};
