@@ -99,20 +99,23 @@ export const signin = async (req, res, next) => {
 
 export const sigout = async (req, res, next) => {};
 
-export const getUser = async (req, res, next) => {
+export const getUser = async (req, res) => {
   try {
     const token = req.cookies.token; // Get token from cookies
+    if (!token) {
+      return res.status(401).json({ success: false, error: "Unauthorized" });
+    }
 
-    if (!token) return res.status(401).json({ message: "Unauthorized" });
+    const decoded = jwt.verify(token, JWT_SECRET); // Decode token
+    const user = await User.findById(decoded.userId).select("-password"); // Exclude password
 
-    const decoded = jwt.verify(token, JWT_SECRET);
-    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
 
-    if (!user) return res.status(401).json({ message: "Unauthorized" });
-
-    res.status(200).json({ success: true, user });
+    res.status(200).json({ success: true, user }); // Return user details
   } catch (error) {
-    res.status(500).json({ success: false, error: "Invalid Token" });
-    next();
+    console.error("GetUser Error:", error);
+    res.status(500).json({ success: false, error: "Server Error" });
   }
 };
