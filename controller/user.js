@@ -74,13 +74,12 @@ export const signin = async (req, res, next) => {
       expiresIn: JWT_EXPIRES_IN,
     });
 
-    // Set token in HttpOnly cookie
     res.cookie("token", token, {
-      httpOnly: true, // Prevents JavaScript access
-      secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
-      sameSite: "Lax", // Allows cross-site requests from links
-      maxAge: 24 * 60 * 60 * 1000, // 1 day expiration (in milliseconds)
+      httpOnly: true,
+      secure: true, // ✅ Set true if using HTTPS
+      sameSite: "None", // ✅ Required for cross-origin cookies
     });
+
     res.status(200).json({
       success: true,
       message: "User signed in successfully",

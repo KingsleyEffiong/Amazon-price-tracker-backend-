@@ -30,6 +30,12 @@ app.use("/api/v1/users", userRouter);
 
 // Error middleware should be AFTER routes
 app.use(errorMiddleware);
+app.use(
+  cors({
+    origin: "http://localhost:5173", // ✅ Replace with your frontend URL
+    credentials: true, // ✅ Allow cookies
+  })
+);
 
 // Default route for unknown endpoints
 app.all("*", (req, res) => {
