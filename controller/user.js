@@ -74,13 +74,6 @@ export const signin = async (req, res, next) => {
       expiresIn: JWT_EXPIRES_IN,
     });
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Only secure in production
-      sameSite: "Lax", // Use "Lax" instead of "Strict" for better compatibility
-      maxAge: 3600000, // 1 hour
-    });
-
     res.status(200).json({
       success: true,
       message: "User signed in successfully",
