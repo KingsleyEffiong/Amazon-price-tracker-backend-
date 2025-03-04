@@ -74,6 +74,13 @@ export const signin = async (req, res, next) => {
       expiresIn: JWT_EXPIRES_IN,
     });
 
+    // Set token in HttpOnly cookie
+    res.cookie("token", token, {
+      httpOnly: true, // Prevents JavaScript access
+      secure: process.env.NODE_ENV === "production", // Only send over HTTPS in production
+      sameSite: "Lax", // Allows cross-site requests from links
+      maxAge: 24 * 60 * 60 * 1000, // 1 day expiration (in milliseconds)
+    });
     res.status(200).json({
       success: true,
       message: "User signed in successfully",
@@ -94,23 +101,18 @@ export const sigout = async (req, res, next) => {};
 
 export const getUser = async (req, res, next) => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid user ID" });
-    }
+    const token = req.cookies.token; // Get token from cookies
 
-    const user = await User.findById(req.params.id).select("-password");
+    if (!token) return res.status(401).json({ message: "Unauthorized" });
 
-    if (!user) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    }
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.userId);
 
-    res.status(200).json({ success: true, data: user });
+    if (!user) return res.status(401).json({ message: "Unauthorized" });
+
+    res.status(200).json({ success: true, user });
   } catch (error) {
-    console.error("Get User Error:", error);
-    next(error);
+    res.status(500).json({ success: false, error: "Invalid Token" });
+    next();
   }
 };
