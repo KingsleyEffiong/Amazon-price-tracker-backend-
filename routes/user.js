@@ -4,4 +4,4 @@ import { getUser } from "../controller/user.js";
 
 export const userRouter = Router();
 
-userRouter.use("/:id", getUser);
+userRouter.use("/:id", authorise, getUser);
