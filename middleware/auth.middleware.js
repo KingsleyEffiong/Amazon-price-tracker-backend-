@@ -17,6 +17,7 @@ export const authorise = async (req, res, next) => {
     ) {
       token = req.headers.authorization.split(" ")[1];
     }
+    console.log(req.headers.authorization);
 
     // If no token is found, return 401
     if (!token) {
