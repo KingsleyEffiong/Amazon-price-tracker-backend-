@@ -1,7 +1,11 @@
 import { Router } from "express";
 import { authorise } from "../middleware/auth.middleware.js";
-import { getUser } from "../controller/user.js";
+import { getUser, updateUser } from "../controller/user.js";
 
 export const userRouter = Router();
 
-userRouter.use("/:id", authorise, getUser);
+// Get user by ID
+userRouter.get("/:id", authorise, getUser);
+
+// Update user by ID
+userRouter.put("/update-user/:id", authorise, updateUser);

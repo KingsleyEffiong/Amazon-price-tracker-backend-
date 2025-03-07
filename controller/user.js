@@ -121,3 +121,44 @@ export const getUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const updateUser = async (req, res, next) => {
+  try {
+    const { email, username, password } = req.body;
+    const userId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid user ID" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    // Prepare update object
+    let updateData = { email, username };
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      updateData.password = await bcrypt.hash(password, salt);
+    }
+
+    // Update user
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
+      new: true,
+    }).select("-password");
+
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+};
