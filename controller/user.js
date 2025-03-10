@@ -97,7 +97,12 @@ export const signin = async (req, res, next) => {
   }
 };
 
-export const sigout = async (req, res, next) => {};
+export const sigout = async (req, res, next) => {
+  try {
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const getUser = async (req, res, next) => {
   try {
@@ -160,5 +165,28 @@ export const updateUser = async (req, res, next) => {
   } catch (error) {
     console.error(error);
     next(error);
+    s;
+  }
+};
+
+export const deleteUser = async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    console.log("Received userId:", userId); // Debugging
+
+    const deletedUser = await User.findByIdAndDelete(userId);
+    if (!deletedUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "User deleted Successfully" });
+  } catch (error) {
+    console.error("MongoDB Deletion Error:", error);
+    res.status(500).json({ error: "Failed to delete user from MongoDB" });
+    next();
   }
 };
