@@ -5,6 +5,7 @@ if (!DB_URL) {
   throw new Error("DB_URL environment variable is not set.");
 }
 
+
 const connectToDB = async () => {
   try {
     await mongoose.connect(DB_URL);
