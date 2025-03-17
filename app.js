@@ -9,10 +9,12 @@ import errorMiddleware from "./middleware/errorMiddleware.js";
 
 const app = express();
 
-// ✅ Fix CORS issues
 app.use(
   cors({
-    origin: "http://localhost:5173", // Allow frontend
+    origin: [
+      "http://localhost:5173",
+      "https://amazon-price-tracker-web-application.vercel.app",
+    ], // Allow frontend
     credentials: true, // Allow cookies
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
