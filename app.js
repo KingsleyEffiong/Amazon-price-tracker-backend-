@@ -13,7 +13,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://amazon-price-tracker-web-application-mox86k6r1.vercel.app",
+      "https://amazon-price-tracker-web-application.vercel.app",
     ], // Allow frontend
     credentials: true, // Allow cookies
     allowedHeaders: ["Content-Type", "Authorization"],
